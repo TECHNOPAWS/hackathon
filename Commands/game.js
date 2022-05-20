@@ -53,7 +53,7 @@ function format(positions) {
 
     if(opponent.id === message.author.id) return message.channel.send('You cannot play against yourself')
 
-    if(opponent.bot /* || opponent.id === '864412190010245121' */) return message.reply('You cannot play againt bots. Sorry not sorry! Don\'t care didn\'t ask + ratio + cope + counter ratio + skill issue + cry about it + pinged owner + canceled + <:what:968876036521623582> + blocked')
+    if(opponent.bot) return message.reply('You cannot play againt bots. Sorry not sorry! Don\'t care didn\'t ask + ratio + cope + counter ratio + skill issue + cry about it + pinged owner + canceled + <:what:968876036521623582> + blocked')
     let positions = {
       first: [`f`, `b`, `b`, `b`, `b`, `b`, `b`, `b`, `b`, `m`],
       second: [`f`, `b`, `b`, `b`, `b`, `b`, `b`, `b`, `b`, `m`]
