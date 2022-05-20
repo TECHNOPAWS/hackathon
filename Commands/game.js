@@ -1,5 +1,21 @@
-const { MessageButton, MessageActionRow } = require('discord.js')
-let speed = 2
+module.exports = {
+  name: 'game',
+  run: async (client,message,args) => {
+    const { MessageButton, MessageActionRow, MessageEmbed } = require('discord.js');
+    
+let speed = 2;
+const opponent = message.mentions.users.first();
+    
+let filter2 = (i) =>{
+   if(i.user.id === opponent.id)  {
+      return true;
+   } else {
+   return i.reply({content:'This is not for you',ephemeral:true})
+        return false;
+      
+   }
+}
+   
 
 function format(positions) {
   return positions.first.map(item => {
@@ -30,14 +46,12 @@ function format(positions) {
     }).join(``) + '\n' + `<:blue:975313938621267968>`.repeat(10)
 }
 
-module.exports = {
-  name: 'game',
-  run: async (client,message,args) => {
-    const opponent = message.mentions.users.first();
+
+    
     let who = null
 		if(!opponent) return message.channel.send('Pls mention a second player');
 
-    if(opponent.id === message.author.id) return message.channel.send('You cannot play against yourself')
+  //  if(opponent.id === message.author.id) return message.channel.send('You cannot play against yourself')
 
     if(opponent.bot /* || opponent.id === '864412190010245121' */) return message.reply('You cannot play againt bots. Sorry not sorry! Don\'t care didn\'t ask + ratio + cope + counter ratio + skill issue + cry about it + pinged owner + canceled + <:what:968876036521623582> + blocked')
     let positions = {
@@ -58,9 +72,52 @@ module.exports = {
     .setStyle('PRIMARY')
     .setCustomId(two)
 
+    const accept = new MessageButton()
+    .setLabel('ACCEPT')
+    .setStyle('SUCCESS')
+    .setCustomId('accept')
+
+    const decline = new MessageButton()
+    .setLabel('DECLINE')
+    .setStyle('DANGER')
+    .setCustomId('decline')
+
+    const requestrow = new MessageActionRow()
+    .addComponents(accept,decline)
+
+    const request = new MessageEmbed()
+    .setTitle('Game Request')
+    .setDescription(`${message.author} has requested you for a game of \`swim race\`, would u like to race?`)
+    .setColor('BLUE')
+
+    
+
     const row = new MessageActionRow()
     .addComponents(btn1,btn2)
 
+    const requestmsg = await message.channel.send({embeds:[request],components:[requestrow]})
+
+    const requestcollector = requestmsg.createMessageComponentCollector({
+      time: '60000',
+      filter: filter2,
+      type: 'BUTTON'
+    })
+
+    requestcollector.on('collect', async interaction => {
+  if(interaction.customId === 'accept'){
+
+    const accepted = new MessageEmbed(interaction.message.embeds[0].data)
+    .setTitle('ACCEPTED')
+    .setColor('GREEN')
+    .setDescription(`This request from ${message.author} has been accepted by ${opponent}`)
+
+    requestrow.components[0].disabled = true;
+    requestrow.components[0].style = 'SUCCESS';
+    requestrow.components[1].disabled = true;
+    requestrow.components[1].style = 'SECONDARY';
+
+    await interaction.update({embeds:[accepted],components:[requestrow]})
+requestcollector.stop()
     const msg = await message.channel.send({
       content: format(positions), components: [row]})
 
@@ -154,4 +211,38 @@ module.exports = {
       update(who)
 		});
   }
+
+      if(interaction.customId === 'decline'){
+        requestrow.components[0].disabled = true;
+        requestrow.components[0].style = 'SECONDARY';
+        requestrow.components[1].disabled = true;
+        requestrow.components[1].style = 'DANGER'
+
+        const declined = new MessageEmbed()
+        .setTitle('Declined')
+        .setDescription(`The game request from ${message.author} has been declined by ${opponent}!`)
+        .setColor('RED')
+
+        await interaction.update({embeds:[declined],components:[requestrow]})
+
+        requestcollector.stop()
+      }
+  })
+
+    requestcollector.on('end', async (collected,reason) => {
+      if(reason === 'time'){
+        requestrow.components[0].disabled = true;
+        requestrow.components[1].disabled = true;
+
+        const timeout = new MessageEmbed()
+        .setTitle('Request Timed Out..')
+        .setDescription(`The request for ${opponent} by ${message.author} has timed out!`)
+        .setColor('YELLOW')
+
+        await requestmsg.edit({components:[requestrow],embeds:[timeout]})
+        await requestmsg.reply({content:'Dont want to play?, Alright!'})
+      }
+    })
+  
+}
 }
