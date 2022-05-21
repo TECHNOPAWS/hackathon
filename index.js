@@ -5,7 +5,7 @@ const client = new Client({
   partials: ['CHANNEL','MESSAGE']
 })
 const prefix = `?`
-
+const mongoose = (global.mongoose = require('mongoose'))
 client.commands = new Collection()
 
 const commandHandler = fs.readdirSync("./Commands")
@@ -34,11 +34,18 @@ client.on("messageCreate", async message => {
     const commandName = args.shift()
      const command = client.commands.find(cmd => cmd.name.includes(commandName))
     
-    if(!command) return; /* console.log(`${message.author.tag} used and undefined command`); */
+    if(!command) return;
     command.run(client, message, args)  
  }
 
 
 })
+
+
+const mongooseConnectionString  = (process.env.mongooseConnectionString)
+    if (!mongooseConnectionString) return;
+
+    mongoose.connect(mongooseConnectionString).then(() => console.log('Connected to mongodb'));
+
 
 client.login(process.env.token)

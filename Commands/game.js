@@ -1,6 +1,17 @@
+const schema = require('../Schema/lb.js')
+
 module.exports = {
   name: 'game',
   run: async (client,message,args) => {
+
+    /* const lb = await schema.findOne({
+      guild: message.guild.id
+    })
+    if(!lb){
+      await schema.create({
+        lb: message.guild.id
+      })
+    } */
     const { MessageButton, MessageActionRow, MessageEmbed } = require('discord.js');
     
 let speed = 2;
@@ -98,14 +109,31 @@ function format(positions) {
     const requestmsg = await message.channel.send({embeds:[request],components:[requestrow]})
 
     const requestcollector = requestmsg.createMessageComponentCollector({
-      time: '60000',
+      time: '30000',
       filter: filter2,
       type: 'BUTTON'
     })
 
     requestcollector.on('collect', async interaction => {
   if(interaction.customId === 'accept'){
-
+    let updateData = await schema.findOneAndUpdate({
+       userid: opponent,
+       guild: message.guild.id,
+     }, {
+      $inc: {
+        matches: 1
+      }
+    })
+    if(!updateData) {
+    updateData = await schema.create({
+    guild:message.guild.id,
+    userid: opponent,
+    matches: 1
+      })
+    }
+    console.log(schema)
+   
+    console.log(updateData) 
     const accepted = new MessageEmbed(interaction.message.embeds[0].data)
     .setTitle('ACCEPTED')
     .setColor('GREEN')
