@@ -177,8 +177,12 @@ requestcollector.stop()
         }
         
         
-      
-				msg.reply(`${who.username} won`);
+      const Winner = new MessageEmbed()
+        .setTitle('Congratulations..')
+        .setDescription(`${who} has won this match :partying_face:!`)
+        .setColor('GREEN')
+        
+				msg.reply({embeds:[Winner]});
 			}
 
 			msg.edit({

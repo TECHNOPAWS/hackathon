@@ -6,7 +6,17 @@ const client = new Client({
 })
 const prefix = `?`
 const mongoose = (global.mongoose = require('mongoose'))
+const express = require('express');
+const app = express()
 client.commands = new Collection()
+
+app.listen(300, () => {
+  console.log('Project running')
+})
+
+app.get('/', (req,res) => {
+  res.send('Listening to port 3000')
+})
 
 const commandHandler = fs.readdirSync("./Commands")
 
