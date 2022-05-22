@@ -24,7 +24,7 @@ module.exports = {
       wins.push(x.wins);
       looses.push(x?.loses ?? 0);
     });
-//console.log(users.length)
+
    const Players = users.concat(Array(10-users.length).fill('???'));
     
    const Wins =  wins.concat(Array(10-wins.length).fill(0));

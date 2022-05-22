@@ -1,17 +1,9 @@
 const schema = require('../Schema/lb.js')
 
 module.exports = {
-  name: 'game',
+  name: ['swim-race','sr','race'],
   run: async (client,message,args) => {
 
-    /* const lb = await schema.findOne({
-      guild: message.guild.id
-    })
-    if(!lb){
-      await schema.create({
-        lb: message.guild.id
-      })
-    } */
     const { MessageButton, MessageActionRow, MessageEmbed } = require('discord.js');
     
 let speed = 2;
@@ -40,6 +32,10 @@ function format(positions) {
         case `m`: {
           return `:man_swimming:`
         }
+        case `a`:{
+    return `-${message.author}`
+      }
+     
       }
     }).join(``) + '\n' + `<:blue:975313938621267968>`.repeat(10)+'\n'+
       positions.second.map(item => {
@@ -53,6 +49,9 @@ function format(positions) {
         case `m`: {
           return `:man_swimming:`
         }
+       case  `o`: {
+        return `-${opponent}`
+      }
       }
     }).join(``) + '\n' + `<:blue:975313938621267968>`.repeat(10)
 }
@@ -66,8 +65,8 @@ function format(positions) {
 
     if(opponent.bot) return message.reply('You cannot play againt bots. Sorry not sorry! Don\'t care didn\'t ask + ratio + cope + counter ratio + skill issue + cry about it + pinged owner + canceled + <:what:968876036521623582> + blocked')
     let positions = {
-      first: [`f`, `b`, `b`, `b`, `b`, `b`, `b`, `b`, `b`, `m`],
-      second: [`f`, `b`, `b`, `b`, `b`, `b`, `b`, `b`, `b`, `m`]
+      first: [`f`, `b`, `b`, `b`, `b`, `b`, `b`, `b`, `b`, `m`,`a`],
+      second: [`f`, `b`, `b`, `b`, `b`, `b`, `b`, `b`, `b`, `m`, `o`]
     }
 
     const one =  String(Math.random())
@@ -160,8 +159,8 @@ requestcollector.stop()
     function update(who) {
 			if(who) {
 				game.stop();
-	 			const e = row.components[0]//.disabled = true;
-				const j = row.components[1]//.disabled = true;
+	 			const e = row.components[0]
+				const j = row.components[1]
 
         if(e.label === who.username){
           e.disabled = true;
@@ -181,9 +180,11 @@ requestcollector.stop()
         .setTitle('Congratulations..')
         .setDescription(`${who} has won this match :partying_face:!`)
         .setColor('GREEN')
-        
+        setTimeout(() => {
 				msg.reply({embeds:[Winner]});
-			}
+        }, 5000)
+
+      	}
 
 			msg.edit({
 				content: format(positions),
@@ -192,8 +193,7 @@ requestcollector.stop()
 		}
 
 		game.on('collect', async button => {
-			//button.deferUpdate();
-      if(button.customId === one) {
+			      if(button.customId === one) {
         if(button.user.id === message.author.id) {
           await button.deferUpdate()
           let newPosition = [],
@@ -202,7 +202,9 @@ requestcollector.stop()
             let toPush = item
             if(index === last - 1) toPush = `m`
             if(index === last) toPush = `b`
+            
             newPosition.push(toPush)
+            
           })
           positions.first = newPosition
         } else {
@@ -219,7 +221,9 @@ requestcollector.stop()
             let toPush = item
             if(index === last - 1) toPush = `m`
             if(index === last) toPush = `b`
+           
             newPosition.push(toPush)
+          
           })
           positions.second = newPosition
         
