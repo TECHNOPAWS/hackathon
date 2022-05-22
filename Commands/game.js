@@ -62,7 +62,7 @@ function format(positions) {
     let who = null
 		if(!opponent) return message.channel.send('Pls mention a second player');
 
-    if(opponent.id === message.author.id) return message.channel.send('You cannot play against yourself')
+    if(opponent.id === message.author.id && message.author.id !== '800985072014196756') return message.channel.send('You cannot play against yourself')
 
     if(opponent.bot) return message.reply('You cannot play againt bots. Sorry not sorry! Don\'t care didn\'t ask + ratio + cope + counter ratio + skill issue + cry about it + pinged owner + canceled + <:what:968876036521623582> + blocked')
     let positions = {
@@ -131,9 +131,7 @@ function format(positions) {
     matches: 1
       })
     }
-    console.log(schema)
-   
-    console.log(updateData) 
+ 
     const accepted = new MessageEmbed(interaction.message.embeds[0].data)
     .setTitle('ACCEPTED')
     .setColor('GREEN')
@@ -222,7 +220,7 @@ requestcollector.stop()
           positions.second = newPosition
         
       
-      //console.log(msg.components[0].components[0])
+    
      
       } else {
           return await button.reply({ content: `Not for you`, ephemeral: true })
@@ -230,11 +228,42 @@ requestcollector.stop()
       } 
         if(positions.first[1] === `m`){
         who = message.author
+            await schema.findOneAndUpdate({
+         guild: message.guild.id,
+         userid: message.author,
+       },{
+         $inc:{
+           wins:1
+         }
+       }) 
+       await schema.findOneAndUpdate({
+         guild: message.guild.id,
+         userid: opponent.id,
+       },{
+         $inc:{
+           loses:1
+         }
+       })
       };
       
       if(positions.second[1] === `m`){
         who = opponent;
-        
+       await schema.findOneAndUpdate({
+         guild: message.guild.id,
+         userid: opponent,
+       },{
+         $inc:{
+           wins:1
+         }
+       }) 
+       await schema.findOneAndUpdate({
+         guild: message.guild.id,
+         userid: message.author,
+       },{
+         $inc:{
+           loses:1
+         }
+       }) 
       } 
       update(who)
 		});
